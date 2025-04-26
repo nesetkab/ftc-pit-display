@@ -1,0 +1,3 @@
+<!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
+
+This is a Next.js project for a FIRST Tech Challenge pit display. It provides live match and queuing data using the FTC Events API and FTC Scout. The project uses WebSocket for real-time updates.
