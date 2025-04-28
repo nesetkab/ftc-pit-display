@@ -1,86 +1,59 @@
-import { gql, request } from 'graphql-request';
+import axios from 'axios';
 
-const GRAPHQL_ENDPOINT = 'https://api.ftcscout.org/graphql';
+const FTC_EVENTS_API_URL = "https://ftc-api.firstinspires.org/v2.0/";
+const HEADERS = { "Authorization": `Basic ${Buffer.from(process.env.FTC_API_KEY || '').toString('base64')}` };
 
-export const fetchMatchData = async (eventCode: string, teamNumber: number) => {
-  const query = gql`
-    query GetMatchData($season: Int!, $code: String!, $teamNumber: Int!) {
-      eventByCode(season: $season, code: $code) {
-        teamMatches(teamNumber: $teamNumber) {
-          season
-          eventCode
-          matchId
-          alliance
-          station
-          teamNumber
-          allianceRole
-          surrogate
-          noShow
-          dq
-          onField
-          createdAt
-          updatedAt
-          match {
-            id
-            hasBeenPlayed
-            scheduledStartTime
-            actualStartTime
-            postResultTime
-            tournamentLevel
-            series
-            matchNum
-            description
-            scores {
-              __typename
-              ... on MatchScores2024 {
-                red {
-                  totalPoints
-                }
-                blue {
-                  totalPoints
-                }
-              }
-            }
-            teams {
-              team {
-                number
-              }
-            }
-          }
-        }
-      }
-    }
-  `;
-
+export const fetchRankings = async (season: string, eventCode: string) => {
+  const url = `/api/proxy`;
   try {
-    const variables = { season: 2024, code: eventCode, teamNumber };
-    const data = await request<{ eventByCode: { teamMatches: any[] } }>(GRAPHQL_ENDPOINT, query, variables);
-    return data.eventByCode.teamMatches;
-  } catch (error) {
-    console.error('Error fetching match data:', error);
+    console.log(`Fetching rankings for season: ${season}, eventCode: ${eventCode}`);
+    const response = await axios.get(url, {
+      params: { path: `${season}/rankings/${eventCode}` },
+    });
+    console.log('Rankings Response:', response.data);
+    return response.data.rankings || [];
+  } catch (error: any) {
+    console.error('Error in fetchRankings:', error.response?.data || error.message);
     throw error;
   }
 };
 
-export const fetchQueuingData = async (eventCode: string) => {
-  const query = gql`
-    query GetEventTeams($season: Int!, $code: String!) {
-      eventByCode(season: $season, code: $code) {
-        teams {
-          teamNumber
-        }
-      }
-    }
-  `;
-
+export const fetchSchedule = async (season: string, eventCode: string, teamNumber: string) => {
+  const url = `/api/proxy`;
   try {
-    const variables = { season: 2024, code: eventCode };
-    console.log('Fetching queuing data with query:', query);
-    console.log('Variables:', variables);
-    const data = await request<{ eventByCode: { teams: { teamNumber: number }[] } }>(GRAPHQL_ENDPOINT, query, variables);
-    return data.eventByCode.teams;
+    console.log(`Fetching schedule for season: ${season}, eventCode: ${eventCode}`);
+    const response = await axios.get(url, {
+      params: { path: `${season}/schedule/${eventCode}?teamNumber=${teamNumber}` },
+    });
+    console.log('Schedule Response:', response.data);
+    return response.data.schedule || [];
+  } catch (error: any) {
+    console.error('Error in fetchRankings:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+
+export const fetchMatches = async (season: string, eventCode: string) => {
+  const url = `${FTC_EVENTS_API_URL}/${season}/matches/${eventCode}`;
+  try {
+    const response = await axios.get(url, { headers: HEADERS });
+    return response.data.matches || [];
   } catch (error) {
-    console.error('Error fetching queuing data:', error);
+    console.error('Error fetching matches:', error);
+    throw error;
+  }
+};
+
+export const fetchTeams = async (season: string, eventCode: string) => {
+  const url = `/api/proxy`;
+  try {
+    const response = await axios.get(url, {
+      params: { path: `${season}/teams`, eventCode },
+    });
+    return response.data.teams || []; // Ensure we access the `teams` property
+  } catch (error) {
+    console.error('Error fetching teams:', error);
     throw error;
   }
 };
