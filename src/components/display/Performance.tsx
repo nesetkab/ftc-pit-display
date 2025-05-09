@@ -21,7 +21,7 @@ export const Performance: React.FC<PerformanceProps> = ({ teamRanking }) => {
       minConstraints={[200, 150]}
       maxConstraints={[600, 400]}
       resizeHandles={['se']}
-      className="p-4  shadow rounded"
+      className="p-4 shadow rounded"
     >
       <h2 className="text-2xl font-semibold mb-4">Performance</h2>
       {teamRanking ? (

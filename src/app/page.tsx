@@ -20,7 +20,7 @@ const LandingPage = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen ">
-      <h1 className="text-4xl font-bold mb-6">ftc pit display</h1>
+      <h1 className="text-4xl font-bold mb-6">jack has positive aura</h1>
       <p className="text-lg mb-4">enter event code:</p>
       <form onSubmit={handleSubmit} className="flex flex-col items-center">
         <input
